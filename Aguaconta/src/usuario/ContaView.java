@@ -18,17 +18,24 @@ import banco.ContaDAO;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.sql.Date;
 
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 
 @SuppressWarnings("serial")
 public class ContaView extends JDialog {
+
+	private static final Locale LOCAL = new Locale("pt", "BR");
 	private JPanel contentPanePrincipal;
 	private JTextField tfCodCliente;
 	private JTextField tfHidrometro;
@@ -36,7 +43,7 @@ public class ContaView extends JDialog {
 	private JTextField tfLeituraAtual;
 	private JTextField tfConsumo;
 	private JTextField tfDescricao;
-	private JTextField tfTotal;
+	private JFormattedTextField tfTotal;
 	private JFormattedTextField tfDtLeitura;
 	private JFormattedTextField tfDtVencimento;
 	private JTextField tfCodEndInst;
@@ -45,12 +52,15 @@ public class ContaView extends JDialog {
 	private JTable tbItens;
 	private static ItensContaTableModel modeloItensConta;
 	private boolean cadastro;
+	private DateFormat df;
+	private DecimalFormat decf;
 
 	/**
 	 * Create the dialog.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
-	public ContaView(int codCliente, int codInst, int codConta, boolean novo) throws Exception {
+	public ContaView(int codCliente, int codInst, int idConta, boolean novo) throws Exception {
 		cadastro = novo;
 		setTitle("Cadastro de Leitura");
 		setResizable(false);
@@ -122,19 +132,19 @@ public class ContaView extends JDialog {
 		JLabel lblLeitura = new JLabel("Data Leitura:");
 		lblLeitura.setBounds(167, 50, 66, 19);
 		getContentPane().add(lblLeitura);
-		
+
 		JLabel lblCodEndInst = new JLabel("Cod. End. Inst.:");
 		lblCodEndInst.setBounds(123, 12, 86, 19);
 		getContentPane().add(lblCodEndInst);
-		
+
 		JLabel lblAno = new JLabel("Ano:");
 		lblAno.setBounds(337, 14, 32, 14);
 		getContentPane().add(lblAno);
-		
+
 		JLabel lblVencimento = new JLabel("Data Vencimento:");
 		lblVencimento.setBounds(328, 50, 85, 19);
 		getContentPane().add(lblVencimento);
-		
+
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 120, 851, 2);
 		getContentPane().add(separator);
@@ -152,7 +162,7 @@ public class ContaView extends JDialog {
 		tfHidrometro.setBounds(67, 49, 86, 20);
 		getContentPane().add(tfHidrometro);
 
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		df = new SimpleDateFormat("dd/MM/yyyy");
 		tfDtLeitura = new JFormattedTextField(df);
 		tfDtLeitura.setColumns(10);
 		tfDtLeitura.setBounds(229, 49, 81, 20);
@@ -196,7 +206,9 @@ public class ContaView extends JDialog {
 		tfDescricao.setBounds(67, 390, 482, 45);
 		getContentPane().add(tfDescricao);
 
-		tfTotal = new JTextField();
+		decf = new DecimalFormat("¤ #,###.00", new DecimalFormatSymbols(LOCAL));
+		decf.setParseBigDecimal(true);
+		tfTotal = new JFormattedTextField(decf);
 		tfTotal.setEditable(false);
 		tfTotal.setColumns(10);
 		tfTotal.setBounds(459, 331, 86, 20);
@@ -223,46 +235,59 @@ public class ContaView extends JDialog {
 		tfAno.setBounds(364, 11, 44, 20);
 		getContentPane().add(tfAno);
 		tfAno.setColumns(10);
-		
+
 		JButton btnSalvar = new JButton("Salvar");
 		btnSalvar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (cadastro) {
-						cadastrarConta();
-					} else {
-						alterarConta();
-						JOptionPane.showMessageDialog(contentPanePrincipal, "Conta Salva", "Alteração Visita",
-								JOptionPane.INFORMATION_MESSAGE,
-								new ImageIcon(getClass().getResource("recursos/okgreen.png")));
-					}
+					atualizarConta(idConta, cadastro);
+					JOptionPane.showMessageDialog(contentPanePrincipal, "Conta Salva", "Alteração Visita",
+							JOptionPane.INFORMATION_MESSAGE,
+							new ImageIcon(getClass().getResource("recursos/okgreen.png")));
 					cadastro = false;
 				} catch (Exception e2) {
-					// TODO: handle exception
+					e2.printStackTrace();
 				}
 			}
 		});
 		btnSalvar.setBounds(229, 446, 98, 26);
-		getContentPane().add(btnSalvar);
 
+		getContentPane().add(btnSalvar);
 
 		JButton btnAdicionarItens = new JButton("Adicionar Itens");
 		btnAdicionarItens.setBounds(10, 327, 106, 23);
 		getContentPane().add(btnAdicionarItens);
 
-		carregarConta(codConta);
-		
+		carregarConta(idConta);
+
 		setVisible(true);
 
 	}
 
-	protected void alterarConta() {
-		// TODO Auto-generated method stub
+	protected void atualizarConta(int idConta, boolean cadastro) {
+		try {
+			BigDecimal total = (BigDecimal) decf.parse(tfTotal.getText());
+			Date venc = new Date(df.parse(tfDtVencimento.getText()).getTime());
+			Date leit = new Date(df.parse(tfDtLeitura.getText()).getTime());
 
-	}
-
-	protected void cadastrarConta() {
-		// TODO Auto-generated method stub
+			if (cadastro) {
+				Conta objConta = new Conta(idConta, Integer.parseInt(tfCodCliente.getText()),
+						Integer.parseInt(tfCodEndInst.getText()), tfHidrometro.getText(),
+						Integer.parseInt(tfMes.getText()), Integer.parseInt(tfAno.getText()), venc, leit,
+						Integer.parseInt(tfLeituraAnterior.getText()), Integer.parseInt(tfLeituraAtual.getText()),
+						Integer.parseInt(tfConsumo.getText()), tfDescricao.getText(), total);
+				// mandar gravar nova conta
+			} else {
+				Conta objConta = new Conta(idConta, Integer.parseInt(tfCodCliente.getText()),
+						Integer.parseInt(tfCodEndInst.getText()), tfHidrometro.getText(),
+						Integer.parseInt(tfMes.getText()), Integer.parseInt(tfAno.getText()), venc, leit,
+						Integer.parseInt(tfLeituraAnterior.getText()), Integer.parseInt(tfLeituraAtual.getText()),
+						Integer.parseInt(tfConsumo.getText()), tfDescricao.getText(), total);
+				// mandar atualizar conta pelo idConta
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -282,7 +307,7 @@ public class ContaView extends JDialog {
 			tfLeituraAtual.setText(Integer.toString(objConta.getLeituraAtual()));
 			tfConsumo.setText(Integer.toString(objConta.getConsumo()));
 			tfDescricao.setText(objConta.getObservacoes());
-	//		tfTotal.setText(Float.toString(objConta.getTotal()));
+			tfTotal.setValue(objConta.getTotal());
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
 		}
@@ -305,20 +330,5 @@ public class ContaView extends JDialog {
 		}
 
 	}
-	/*
 
-	protected void cadastraConta(int mes) throws Exception, SQLException {
-		try {
-			Conta objConta = new Conta(Integer.parseInt(tfCodCliente.getText()), tfHidrometro.getText(), mes,
-					Integer.parseInt(textFieldAno.getText()), tfDtLeitura.getText(), tfDtVencimento.getText(),
-					Integer.parseInt(tfLeituraAnterior.getText()), Integer.parseInt(tfLeituraAtual.getText()),
-					Integer.parseInt(tfConsumo.getText()), Float.parseFloat(textFieldValor.getText()),
-					Float.parseFloat(textFieldOutrosValores.getText()), tfDescricao.getText(),
-					Float.parseFloat(tfTotal.getText()));
-			BancoConta.cadastrarConta(objConta);
-		} catch (Exception e) {
-			throw new Exception(e.getMessage());
-		}
-
-	}*/
 }
