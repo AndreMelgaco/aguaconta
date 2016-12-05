@@ -51,7 +51,7 @@ public class AddFaixas extends JDialog {
 				dispose();
 			}
 		});
-		btnSalvar.setBounds(47, 137, 98, 26);
+		btnSalvar.setBounds(4, 114, 98, 26);
 
 		getContentPane().add(btnSalvar);
 
@@ -92,6 +92,20 @@ public class AddFaixas extends JDialog {
 		ftfValorUnico = new JFormattedTextField(df);
 		ftfValorUnico.setBounds(103, 59, 75, 18);
 		getContentPane().add(ftfValorUnico);
+		
+		JButton btnExcluir = new JButton("Excluir");
+		btnExcluir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					excluirFaixa(mes, ano);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				dispose();
+			}
+		});
+		btnExcluir.setBounds(147, 142, 75, 23);
+		getContentPane().add(btnExcluir);
 
 		carregaFaixa(codUnidConsumo, faixa);
 		setVisible(true);
@@ -120,6 +134,20 @@ public class AddFaixas extends JDialog {
 
 		try {
 			ConfigDAO.atualizaFaixas(cv);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void excluirFaixa(int mes, int ano) throws Exception {
+		BigDecimal valorUnit = (BigDecimal) df.parse(tfValorUnit.getText());
+		BigDecimal valorUnico = (BigDecimal) df.parse(ftfValorUnico.getText());
+
+		ConfigValores cv = new ConfigValores(Integer.parseInt(tfUnidConsumo.getText()),
+				mes, ano, Integer.parseInt(tfFaixa.getText()), valorUnico, valorUnit);
+
+		try {
+			ConfigDAO.excluirFaixa(cv);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

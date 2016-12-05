@@ -252,7 +252,6 @@ public class ConfigDAO {
 	}
 
 	public static void atualizaFaixas(ConfigValores cv) throws Exception {
-		System.out.println(cv.getCodUnidadeConsumo() + " " + cv.getFaixas() );
 		try {
 			PreparedStatement objCons = Banco.objCon
 					.prepareStatement("SELECT * FROM CONFIG_VALORES WHERE COD_UNID_CONSUMO = ? AND FAIXA = ?");
@@ -280,6 +279,17 @@ public class ConfigDAO {
 			}
 		} catch (Exception e) {
 			throw new Exception(e.getMessage());
+		}
+	}
+	
+	public static void excluirFaixa(ConfigValores cv) throws Exception {
+		try {
+			PreparedStatement objDelete = Banco.objCon.prepareStatement(
+					"DELETE FROM CONFIG_VALORES WHERE COD_UNID_CONSUMO = ? AND FAIXA = ?");
+			objDelete.setInt(1, cv.getCodUnidadeConsumo());
+			objDelete.setInt(2, cv.getFaixas());
+			objDelete.executeUpdate();
+		} catch (Exception e) {
 		}
 	}
 
