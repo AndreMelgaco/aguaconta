@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.0.final using JasperReports Library version 6.0.0  -->
+<!-- 2014-12-15T04:52:17 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cliente" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="467907b1-fddf-4d3f-8bca-f1a0a195258a">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Aguaconta"/>
+	<queryString>
+		<![CDATA[select * from cliente]]>
+	</queryString>
+	<field name="COD_CLIENTE" class="java.lang.Integer"/>
+	<field name="NOME_CLIENTE" class="java.lang.String"/>
+	<field name="CPF" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="73" y="8" width="100" height="30" uuid="a3275941-04a7-4536-a65d-4be6c9bd3a78"/>
+				<text><![CDATA[Clientes]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="330" y="0" width="100" height="30" uuid="65687590-e9d3-4853-a020-4aac49ccf070"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH:mm">
+				<reportElement x="430" y="0" width="100" height="30" uuid="0a308f0c-2434-4bdd-8c9c-e8be3ad1e9ec"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement x="10" y="0" width="100" height="30" uuid="be2aef24-5e4e-412c-80cc-e51491dcf6d4"/>
+				<text><![CDATA[CodCliente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="100" height="30" uuid="aa4ad324-395d-43ec-9954-edbb51de7335"/>
+				<text><![CDATA[Nome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="0" width="100" height="30" uuid="dffdf68a-1ce4-4aa5-8bef-f3c518be72bc"/>
+				<text><![CDATA[CPF]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<textField>
+				<reportElement x="10" y="0" width="100" height="30" uuid="b6101363-c236-43f1-9317-f3a1f172a469"/>
+				<textFieldExpression><![CDATA[$F{COD_CLIENTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="100" height="30" uuid="db04713c-5be9-4c76-947c-07d186658789"/>
+				<textFieldExpression><![CDATA[$F{NOME_CLIENTE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="0" width="100" height="30" uuid="d64b2f03-ab9a-4670-b073-9e0fb19044b0"/>
+				<textFieldExpression><![CDATA[$F{CPF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
