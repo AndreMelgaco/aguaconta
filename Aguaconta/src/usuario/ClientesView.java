@@ -41,7 +41,6 @@ public class ClientesView extends JDialog {
 		try {
 			modelo.adicionaLista(ClienteDAO.listarCliente("", ""));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
